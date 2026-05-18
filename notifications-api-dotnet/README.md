@@ -102,7 +102,7 @@ require modifying the core processor logic.
 to ensure all read, write, and clear operations on the static list are safe from concurrent modifications. 
 Modified GetAll() to return a copy (ToList()) to protect consumers from active mutations.
 
-2. **Secure PUT Endpoint with DTOs: Removed the dangerous reflection code from the PUT endpoint. 
+2. **Secure PUT Endpoint with DTOs**: Removed the dangerous reflection code from the PUT endpoint. 
 Created a dedicated Data Transfer Object <UpdateNotificationRequest> to explicitly restrict user modifications 
 to safe fields (Message and TargetChannels).
 
