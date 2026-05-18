@@ -23,20 +23,34 @@ app.MapGet("/notifications/{id:int}", (int id) =>
     return Results.Json(n);
 });
 
-app.MapPut("/notifications/{id:int}", async (int id, HttpRequest request) =>
+app.MapPut("/notifications/{id:int}", async (int id, UpdateNotificationRequest req) =>
 {
     var n = Storage.FindById(id);
     if (n == null) return Results.Json(new { error = "not found" }, statusCode: 404);
-    var updates = await JsonSerializer.DeserializeAsync<Dictionary<string, JsonElement>>(request.Body);
-    foreach (var kvp in updates!)
+    // Update carefully, only the fields that the user allowed to change
+    if (req.Message != null)
     {
-        var prop = typeof(Notification).GetProperty(kvp.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-        if (prop != null && prop.CanWrite)
+        n.Message = req.Message;
+        if (n.TargetChannels.Any(c => c.Type == "sms"))
         {
-            var value = kvp.Value.Deserialize(prop.PropertyType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            prop.SetValue(n, value);
+            n.SmsSegments = SmsSegmenter.MinSegments(req.Message);
         }
     }
+
+    if (req.TargetChannels != null)
+    {
+        n.TargetChannels = req.TargetChannels;
+        // Update segments
+        if (n.TargetChannels.Any(c => c.Type == "sms"))
+        {
+            n.SmsSegments = SmsSegmenter.MinSegments(n.Message);
+        }
+        else
+        {
+            n.SmsSegments = 0;
+        }
+    }
+
     return Results.Json(n);
 });
 
@@ -55,3 +69,6 @@ app.MapPost("/notifications/send-bulk", () =>
 });
 
 app.Run("http://localhost:3000");
+
+public record UpdateNotificationRequest(List<Channel>? TargetChannels, string? Message);
+

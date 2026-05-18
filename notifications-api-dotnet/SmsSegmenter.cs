@@ -11,24 +11,40 @@ public static class SmsSegmenter
     public static int MinSegments(string message)
     {
         if (string.IsNullOrWhiteSpace(message)) return 0;
+
         var words = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (words.Length == 0) return 0;
-        return MinSegmentsFrom(words, 0);
-    }
 
-    private static int MinSegmentsFrom(string[] words, int start)
-    {
-        if (start >= words.Length) return 0;
-        int best = int.MaxValue;
-        int currentLen = 0;
-        for (int end = start; end < words.Length; end++)
+        int segmentsCount = 1;
+        int currentSegmentLength = 0;
+
+        foreach (var word in words)
         {
-            int add = currentLen == 0 ? words[end].Length : words[end].Length + 1;
-            if (currentLen + add > MaxSegmentChars) break;
-            currentLen += add;
-            int rest = MinSegmentsFrom(words, end + 1);
-            if (rest + 1 < best) best = rest + 1;
+            int wordLength = word.Length;
+
+            // If a single word exceeds the maximum character limit, it cannot fit 
+            // into any segment without breaking the "no split" constraint.
+            if (wordLength > MaxSegmentChars)
+            {
+                return 0;
+            }
+
+            // A space must be added between words, unless it's the first word in the current segment
+            int lengthToAdd = (currentSegmentLength == 0) ? wordLength : wordLength + 1;
+
+            // Check if the word fits into the current SMS segment
+            if (currentSegmentLength + lengthToAdd <= MaxSegmentChars)
+            {
+                currentSegmentLength += lengthToAdd;
+            }
+            else
+            {
+                // Move the word to a brand new segment
+                segmentsCount++;
+                currentSegmentLength = wordLength;
+            }
         }
-        return best == int.MaxValue ? 0 : best;
+
+        return segmentsCount;
     }
 }
