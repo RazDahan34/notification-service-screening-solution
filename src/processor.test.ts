@@ -66,11 +66,12 @@ test("a temporary failure with no permanent failure -> retry_pending", () => {
   assert.equal(n.status, RETRY_PENDING);
 });
 
-test("a permanent failure -> failed", () => {
+test("a permanent failure -> failed, lastError is the provider message (no double tag)", () => {
   const p = new NotificationProcessor({ email: perm });
   const n = notif([{ type: "email", value: "a@b.c" }]);
   p.sendOne(n);
   assert.equal(n.status, FAILED);
+  assert.equal(n.lastError, "permanent failure");
 });
 
 test("permanent failure dominates a temporary one -> failed", () => {
@@ -98,6 +99,7 @@ test("an unknown channel type -> failed, even if another channel is ok", () => {
   ]);
   p.sendOne(n);
   assert.equal(n.status, FAILED);
+  assert.match(n.lastError ?? "", /\[carrier-pigeon\] unknown channel type/);
 });
 
 test("no target channels -> failed", () => {

@@ -74,7 +74,9 @@ export class NotificationProcessor {
       if (outcome === "ok") continue;
 
       if (outcome === "permanent") anyPermanent = true;
-      errors.push(`[${channel.type}] ${response.Message}`.trim());
+      // Provider messages are already channel-tagged (e.g. "[email] ..."), so
+      // use them as-is rather than prefixing a second tag.
+      errors.push(response.Message);
     }
 
     if (errors.length === 0) {
