@@ -30,7 +30,10 @@ export function addNotification(
 }
 
 export function getAll(): Notification[] {
-  return notifications;
+  // Return a copy of the list so callers can't push/splice into the store.
+  // Element identity is preserved intentionally: the processor updates a
+  // notification's status in place, and that must persist.
+  return [...notifications];
 }
 
 export function findById(id: number): Notification | undefined {
