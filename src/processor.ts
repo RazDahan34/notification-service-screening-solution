@@ -91,8 +91,11 @@ export class NotificationProcessor {
   }
 
   sendAll(): void {
-    const pending = storage.getAll().filter((n) => n.status === PENDING);
-    for (const n of pending) {
+    // Drain both fresh and retry-eligible notifications.
+    const due = storage
+      .getAll()
+      .filter((n) => n.status === PENDING || n.status === RETRY_PENDING);
+    for (const n of due) {
       this.sendOne(n);
     }
   }
