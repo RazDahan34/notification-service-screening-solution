@@ -1,0 +1,4 @@
+#!/bin/sh
+# Block pushing a red tree. "Done" means verify passes: typecheck + full suite.
+# WIP commits flow freely; only publishing a broken state is stopped.
+npm run --silent verify

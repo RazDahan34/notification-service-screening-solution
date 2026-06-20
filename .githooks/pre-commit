@@ -1,0 +1,4 @@
+#!/bin/sh
+# Block commits that don't typecheck. Keeps every commit compiling, which is
+# cheap and lets intermediate TDD commits (failing tests, valid types) through.
+npm run --silent typecheck

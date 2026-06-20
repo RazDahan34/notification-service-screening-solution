@@ -1,0 +1,4 @@
+# Normalize line endings so diffs stay clean across OSes.
+* text=auto eol=lf
+*.mjs text eol=lf
+*.sh text eol=lf
