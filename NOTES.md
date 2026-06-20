@@ -92,3 +92,32 @@ Two test-harness gotchas worth recording:
   whole run. Fixed by registering teardown with `t.after(...)` (runs on failure
   too) and `server.closeAllConnections()` (Node's `fetch` keep-alive otherwise
   blocks `server.close()`). Also set `--test-timeout` so the gate can't hang.
+
+### 2026-06-20 — Green, then checked it twice
+
+All fixes landed test-first, one concern per commit. Final suite: **30 tests, 30
+pass, 0 fail**; `npm run verify` (typecheck + tests) is green.
+
+Manual testing against a running server (curl), before vs after the fixes:
+- PUT `{id:999,status:"hacked",attempts:-5,smsSegments:4242}` — *before* it
+  overwrote all of them; *after*, only `message` changes, the rest hold.
+- `POST` with a missing `targetChannels` — *before* 500; *after* 400.
+- Send to an invalid email — *before* `status:"sent"` with a `lastError` that
+  literally said "invalid recipient address"; *after* `status:"failed"`.
+
+Fresh-eyes review pass over the final diff found one real (cosmetic) defect the
+tests hadn't pinned: `lastError` read `[email] [email] invalid recipient
+address` — the processor was tagging a provider message that was already tagged.
+Fixed to use the provider message as-is, kept an explicit tag only for the
+unknown-channel case, and added assertions so it can't regress. Re-verified
+live: `[email] invalid recipient address | [carrier-pigeon] unknown channel
+type`.
+
+Things I deliberately left (scope / honesty, not omissions):
+- `npm install` reports a few advisories in Express's transitive deps. Not
+  touched — unrelated to the task and out of scope for a screening fix.
+- Malformed JSON bodies fall through to Express's default error page. A small
+  JSON-error handler would return a tidy 400; noted as future work.
+- Storage is a module-level singleton; tests reset it via `seed()`. A storage
+  instance injected into `createApp` would isolate state better but is a larger
+  change than the screening calls for.
