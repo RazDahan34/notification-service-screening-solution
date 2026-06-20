@@ -1,6 +1,7 @@
 import express from "express";
 import { addNotification, getAll, findById } from "./storage.js";
 import { NotificationProcessor } from "./processor.js";
+import { validateCreate } from "./validation.js";
 
 // Builds the Express app and registers routes. Construction is separated from
 // port binding (see index.ts) so tests can drive the routes in-process.
@@ -12,8 +13,13 @@ export function createApp(
   app.use(express.json());
 
   app.post("/notifications", (req, res) => {
-    const n = addNotification(req.body.targetChannels, req.body.message);
-    res.json(n);
+    const parsed = validateCreate(req.body);
+    if (!parsed.ok) {
+      res.status(400).json({ error: parsed.error });
+      return;
+    }
+    const n = addNotification(parsed.value.targetChannels, parsed.value.message);
+    res.status(201).json(n);
   });
 
   app.get("/notifications", (_req, res) => {
