@@ -29,3 +29,13 @@ test("a single word longer than the limit gets its own segment, not 0", () => {
 test("an over-long word is not merged away into a free segment", () => {
   assert.equal(minSmsSegments("hi " + "a".repeat(200)), 2);
 });
+
+test("handles a large message quickly (linear, not exponential)", () => {
+  // The previous recursive implementation blew up on inputs this size.
+  const msg = Array.from({ length: 5000 }, () => "word").join(" ");
+  const start = performance.now();
+  const segments = minSmsSegments(msg);
+  const elapsed = performance.now() - start;
+  assert.ok(segments > 1);
+  assert.ok(elapsed < 1000, `segmentation should be fast, took ${elapsed}ms`);
+});
