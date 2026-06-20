@@ -71,3 +71,24 @@ hard bounce. Known limitation: there's no per-channel delivery ledger, so a
 `retry_pending` notification that is retried will re-send to channels that
 already succeeded. Out of scope to fix fully here (would need per-channel state);
 captured in SPEC §8 and README future-work.
+
+### 2026-06-20 — Red baseline captured
+
+Wrote the spec suite across four files (segmenter, processor, storage, app
+integration) using `node:test` + in-process `fetch`. First full run:
+
+```
+ℹ tests 29
+ℹ pass  11
+ℹ fail  18
+```
+
+All 18 failures are the planted bugs, not flaky tests; the 11 green are the parts
+the starter already gets right. This is the red baseline the fixes drive to green.
+
+Two test-harness gotchas worth recording:
+- `node:test` runs the *spec* reporter (✔/✖) on a non-TTY here, not TAP.
+- A failing assertion skips trailing cleanup, so leaked HTTP servers hung the
+  whole run. Fixed by registering teardown with `t.after(...)` (runs on failure
+  too) and `server.closeAllConnections()` (Node's `fetch` keep-alive otherwise
+  blocks `server.close()`). Also set `--test-timeout` so the gate can't hang.
