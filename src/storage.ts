@@ -10,14 +10,21 @@ import { minSmsSegments } from "./segmenter.js";
 const notifications: Notification[] = [];
 let nextId = 1;
 
+// SMS billing only applies when an sms channel is targeted; otherwise 0.
+// Centralized so create and update derive the value the same way.
+export function smsSegmentsFor(
+  channels: TargetChannel[],
+  message: string
+): number {
+  return channels.some((c) => c.type === "sms") ? minSmsSegments(message) : 0;
+}
+
 export function addNotification(
   targetChannels: TargetChannel[],
   message: string
 ): Notification {
   const n = new Notification(nextId++, targetChannels, message);
-  if (targetChannels.some((c) => c.type === "sms")) {
-    n.smsSegments = minSmsSegments(message);
-  }
+  n.smsSegments = smsSegmentsFor(targetChannels, message);
   notifications.push(n);
   return n;
 }
