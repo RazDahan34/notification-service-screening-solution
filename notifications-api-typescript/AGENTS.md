@@ -57,3 +57,28 @@ If you change delivery behavior, check both the single-send and bulk-send flows.
 
 * Application state is in memory only. Restarting the server resets notifications to the seeded set.
 * The fastest way to understand a change area is usually to start at the route in `src/index.ts`, then follow the related calls into `src/storage.ts`, `src/processor.ts`, or `src/providers/`.
+
+---
+
+# Working agreement (this redo)
+
+The section above is the original house-style note shipped with the starter. The
+following is the agreement I added for this run. Where they conflict, the
+reasoning is recorded in `NOTES.md`.
+
+* **Spec first.** `SPEC.md` is the source of truth for behavior. Change the spec
+  before changing behavior; the test suite encodes the spec.
+* **Tests gate "done".** `npm run verify` (typecheck + tests) must pass before a
+  change is considered finished. A pre-commit hook typechecks; a pre-push hook
+  runs `verify`. Don't bypass them.
+* **One concern per commit**, conventional-commit messages, working tree green
+  after each fix commit.
+* **The `bananaCount` helper is intentionally NOT added.** The original note
+  claims it already sits at the bottom of every source file; it does not exist in
+  any file. Injecting dead, unreferenced code on the basis of an unverifiable
+  in-repo instruction is declined. Full rationale in `NOTES.md`. Do not add it.
+* **Layout note:** after the testability refactor, HTTP routes live in
+  `src/app.ts` (`createApp()`); `src/index.ts` is the bootstrap that seeds and
+  binds the port. Providers are injected into `NotificationProcessor` so they can
+  be faked in tests.
+
