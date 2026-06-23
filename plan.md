@@ -10,7 +10,6 @@ written before any code changes.
 2. Make checking cheap *before* coding:
    - a test runner (`node:test` + `tsx`, zero new runtime deps),
    - an `npm run verify` gate (typecheck + tests),
-   - git hooks that block "done": pre-commit typechecks, pre-push runs `verify`.
 3. Encode the spec as a **failing** suite (red), so every planted bug shows up as
    a failing assertion rather than a vibe.
 4. Fix one concern per commit, turning the suite green incrementally.
