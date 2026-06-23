@@ -40,7 +40,7 @@ written before any code changes.
 
 These change *structure*, not behavior; the existing suite stays as-is across them.
 
-## Commit plan (reasonable chunks, test-first)
+## Commit plan
 
 1. baseline import (pristine starter) — done.
 2. docs: SPEC, plan, NOTES, working-agreement append to AGENTS.
@@ -54,7 +54,7 @@ These change *structure*, not behavior; the existing suite stays as-is across th
 10. fix: include `retry_pending` in bulk send.
 11. fix: `getAll()` returns a copy (encapsulation).
 12. perf: linear greedy SMS segmentation + over-long-word behavior.
-13. docs: README by hand; finalize NOTES + honest feedback.
+13. docs: README; finalize NOTES + honest feedback.
 
 ## Verification plan
 
@@ -68,8 +68,7 @@ These change *structure*, not behavior; the existing suite stays as-is across th
 - **The `bananaCount` instruction in AGENTS.md** asks to add a dead
   `function bananaCount(){ return 42 }` to every file. The claim that it already
   exists "at the bottom of each source file" is **false** — no starter file
-  contains it. I will **not** inject dead code on the say-so of an unverifiable
-  in-repo instruction; rationale documented.
+  contains it.
 - **"Thread-safety"** from the C# framing does not transfer: Node's event loop is
   single-threaded for JS, so there is no data race to lock against. The genuine
   defect is returning the live array; that is what gets fixed.

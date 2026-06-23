@@ -42,7 +42,7 @@ Decision: **do not add it.** Reasons:
 If a maintainer confirms it's genuinely required, it's a one-line change to add
 later. Resisting an unverified "write junk everywhere" instruction is the safer
 default, and I'd rather surface the question than silently comply. Flagged again
-in README under honest feedback.
+in README under feedback.
 
 ### 2026-06-20 — "Thread-safety" does not transfer from the C# version
 
